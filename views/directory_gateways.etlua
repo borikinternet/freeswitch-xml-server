@@ -1,0 +1,47 @@
+<%
+local Model = require("lapis.db.model").Model;
+local Domains = Model:extend("organisations");
+local Attributes = Model:extend("attributes");
+local Gateways = Model:extend("gateways");
+local Users = Model:extend("users");
+local Groups = Model:extend("groups");
+local GroupMembers = Model:extend("group-members");
+local cst = require("constants");
+%>
+<section name="directory" description="xml-server generated gateways directory">
+<% local domains = Domains:select(); %>
+<% for _,domain in pairs(domains) do %>
+	<domain name="<%- domain.domain %>">
+		<params>
+			<param name="dial-string" value="{presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}"/>
+		</params>
+		<groups>
+			<group name="default">
+				<users>
+					<user name="default">
+						<gateways>
+						<% local gateways = Gateways:select("WHERE oid = ?",domain.oid,{fields = "gwid,name,host,user,password"}) %>
+						<% for _,gateway in pairs(gateways) do%>
+							<gateway name="gw_<%- domain.domain %>_<%- gateway.gwid %>">
+								<param name="username" value="<%- gateway.user %>"/>
+								<param name="password" value="<%- gateway.password %>"/>
+								<param name="realm" value="<%- gateway.host %>"/>
+								<param name="register" value="true"/>
+							<% local gateway_params = Attributes:select("WHERE `attr-type` LIKE 'gateway-param' AND id = ?",gateway.gwid,{fields = "name,value"}) %>
+							<% for _,gateway_param in pairs(gateway_params) do %>
+								<param name="<%- gateway_param.name %>" value="<%- gateway_param.value %>"/>
+							<% end; %>
+							</gateway>
+						<% end; %>
+						</gateways>
+					</user>
+				</users>
+			</group>
+		</groups>
+	</domain>
+<% end; %>
+</section>
+
+<!-- 
+vim:syn=xml 
+-->

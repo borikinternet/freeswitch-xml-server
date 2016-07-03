@@ -1,13 +1,17 @@
-local lapis = require("lapis");
-local app = lapis.Application();
+local app = require("lapis").Application();
 app:enable("etlua");
 
-local app_helpers = require("lapis.application")
-local capture_errors = app_helpers.capture_errors
-local respond_to = app_helpers.respond_to
+local app_helpers = require("lapis.application");
+local capture_errors = app_helpers.capture_errors;
+local respond_to = app_helpers.respond_to;
 
-app:get("/", function()
-  return "Welcome to Lapis " .. require("lapis.version")
-end);
+local XML = require("XMLGenerator");
+
+local xmlRespondTable = {
+	GET = capture_errors(XML.generate),
+	POST = capture_errors(XML.generate)
+}
+
+app:match("xml", "/xml", respond_to(xmlRespondTable));
 
 return app;

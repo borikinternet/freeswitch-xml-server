@@ -1,0 +1,31 @@
+<%
+local Model = require("lapis.db.model").Model;
+local Domains = Model:extend("organisations");
+local Attributes = Model:extend("attributes");
+local cst = require("constants");
+%>
+<section name="directory" description="xml-server generated full directory">
+<% local domains = Domains:select("WHERE domain LIKE ?;",params.domain,{fields = "oid"}); %>
+<% for _,domain in pairs(domains) do %>
+	<domain name="<%- params.domain %>">
+		<params>
+			<param name="dial-string" value="{presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}"/>
+		<% local param_attrs = Attributes:select("WHERE `attr-type` LIKE 'domain_param' AND id = ?",domain.oid,{fields = "name,value"}) %>
+		<% for _,param in pairs(param_attrs) do %>
+			<param name="<%- param.name %>" value="<%- param.value %>"/>
+		<% end; %>
+		</params>
+		<variables>
+			<variable user_context="<%= cst.user_context %>"/>
+		<% local vars = Attributes:select("WHERE `attr-type` LIKE 'domain_var' AND id = ?",domain.oid,{fields = "name,value"}) %>
+		<% for _,var in pairs(vars) do %>
+			<variable name="<%- var.name %>" value="<%- var.value %>"/>
+		<% end; %>
+		</variables>
+	</domain>
+<% end; %>
+</section>
+
+<!-- 
+vim:syn=xml 
+-->
