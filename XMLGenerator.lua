@@ -7,43 +7,43 @@ local to_json = util.to_json;
 local my_utils = require ("my_utils");
 
 function xg.generate(self)
-	print(to_json(self.params));
+	--print(to_json(self.params));
 	local template = nil;
 	self.params.user = my_utils.split(self.params.user,"@");
 	if my_utils.isTable(self.params.user) 
 		then self.params.user = self.params.user[1] end;
-	if		self.params.section == "directory" and 
-			self.params.tag_name == "" and 
-			self.params.key_name == "" and 
-			self.params.purpose ~= "gateways" 
+	if		self.params.section == "directory" 
+			and self.params.tag_name == "" 
+			and self.params.key_name == "" 
+			and self.params.purpose ~= "gateways" 
 		then template = "directory_full" 
-	elseif	self.params.section == "directory" and 
-			self.params.tag_name == "" and 
-			self.params.key_name == "" and 
-			self.params.purpose == "gateways" and 
-			self.params.profile == "internal" 
+	elseif	self.params.section == "directory" 
+			and self.params.tag_name == "" 
+			and self.params.key_name == "" 
+			and self.params.purpose == "gateways" 
 		then template = "directory_gateways" 
-	elseif	self.params.section == "directory" and 
-			self.params.tag_name == "domain" and 
-			self.params.key_name == "name" and 
-			self.params.purpose == "network-list" 
+	elseif	self.params.section == "directory" 
+			and self.params.tag_name == "domain" 
+			and self.params.key_name == "name" 
+			and self.params.purpose == "network-list" 
 		then template = "netwrok_list"
-	elseif	self.params.section == "directory" and 
-			self.params.tag_name == "domain" and 
-			self.params.key_name == "name" and 
-			self.params.user and 
-			not self.params.purpose
+	elseif	self.params.section == "directory" 
+			and self.params.tag_name == "domain" 
+			and self.params.key_name == "name" 
+			and self.params.user 
+			and not self.params.purpose
 		then template = "directory_user"
-	elseif	self.params.section == "directory" and 
-			self.params.tag_name == "domain" and 
-			self.params.key_name == "name" and 
-			self.params.group and 
-			self.params.action == "group_call" and not self.params.purpose 
+	elseif	self.params.section == "directory" 
+			and self.params.tag_name == "domain" 
+			and self.params.key_name == "name" 
+			and self.params.group 
+			and self.params.action == "group_call" 
+			and not self.params.purpose 
 		then template = "directory_group"
-	elseif	self.params.section == "directory" and 
-			self.params.tag_name == "domain" and 
-			self.params.key_name == "name" and 
-			self.params.domain
+	elseif	self.params.section == "directory" 
+			and self.params.tag_name == "domain" 
+			and self.params.key_name == "name" 
+			and self.params.domain
 		then template = "directory_domain"
 	end;
 	return {
