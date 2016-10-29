@@ -12,9 +12,9 @@ config("development", {
 })
 
 config("production", {
-	port = 8888,
+	port = 8080,
 	num_workers = 4,
-	code_cache = "on",
+	code_cache = "off",
 	daemon = "on",
 	mysql = {
 		host = '127.0.0.1',
