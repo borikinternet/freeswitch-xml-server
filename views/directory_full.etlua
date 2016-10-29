@@ -9,7 +9,7 @@ local GroupMembers = Model:extend("group-members");
 local cst = require("constants");
 %>
 <section name="directory" description="xml-server generated full directory">
-<% local domains = Domains:select(); %>
+<% local domains = Domains:select("WHERE active = 1"); %>
 <% for _,domain in pairs(domains) do %>
 	<domain name="<%- domain.domain %>">
 		<params>
@@ -29,9 +29,9 @@ local cst = require("constants");
 		<groups>
 			<group name="default">
 				<users>
-					<user name="default">
+					<user id="default">
 						<gateways>
-						<% local gateways = Gateways:select("WHERE oid = ?",domain.oid,{fields = "gwid,name,host,user,password"}) %>
+						<% local gateways = Gateways:select("WHERE oid = ? AND active = 1",domain.oid,{fields = "gwid,name,host,user,password"}) %>
 						<% for _,gateway in pairs(gateways) do%>
 							<gateway name="gw_<%- domain.domain %>_<%- gateway.gwid %>">
 								<param name="username" value="<%- gateway.user %>"/>
@@ -46,7 +46,7 @@ local cst = require("constants");
 						<% end; %>
 						</gateways>
 					</user>
-				<% local users = Users:select("WHERE oid = ?",domain.oid,{fields = "number,name,uid,password,email"}); %>
+				<% local users = Users:select("WHERE oid = ? AND active = 1",domain.oid,{fields = "number,name,uid,password,email"}); %>
 				<% for _,user in pairs(users) do %>
 					<user id="<%- user.number %>" mailbox="<%- user.email %>">
 						<params>
@@ -84,7 +84,7 @@ local cst = require("constants");
 				<param name="<%- group_var.name %>" value="<%- group_var.value %>"/>
 			<% end; %>
 				<users>
-				<% local group_members = GroupMembers:select("INNER JOIN users USING (uid) WHERE gid = ?",group.gid,{fields = "number"}) %>
+				<% local group_members = GroupMembers:select("INNER JOIN users USING (uid) WHERE gid = ? AND users.active = 1",group.gid,{fields = "number"}) %>
 				<% for _,group_member in pairs(group_members) do %>
 					<user id="<%- group_member.number %>" type="pointer"/>
 				<% end; %>

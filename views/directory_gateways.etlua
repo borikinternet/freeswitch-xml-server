@@ -3,13 +3,10 @@ local Model = require("lapis.db.model").Model;
 local Domains = Model:extend("organisations");
 local Attributes = Model:extend("attributes");
 local Gateways = Model:extend("gateways");
-local Users = Model:extend("users");
-local Groups = Model:extend("groups");
-local GroupMembers = Model:extend("group-members");
 local cst = require("constants");
 %>
 <section name="directory" description="xml-server generated gateways directory">
-<% local domains = Domains:select(); %>
+<% local domains = Domains:select("WHERE active = 1"); %>
 <% for _,domain in pairs(domains) do %>
 	<domain name="<%- domain.domain %>">
 		<params>
@@ -18,9 +15,9 @@ local cst = require("constants");
 		<groups>
 			<group name="default">
 				<users>
-					<user name="default">
+					<user id="default">
 						<gateways>
-						<% local gateways = Gateways:select("WHERE oid = ?",domain.oid,{fields = "gwid,name,host,user,password"}) %>
+						<% local gateways = Gateways:select("WHERE oid = ? AND active = 1",domain.oid,{fields = "gwid,name,host,user,password"}) %>
 						<% for _,gateway in pairs(gateways) do%>
 							<gateway name="gw_<%- domain.domain %>_<%- gateway.gwid %>">
 								<param name="username" value="<%- gateway.user %>"/>

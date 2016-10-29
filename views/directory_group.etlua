@@ -2,14 +2,12 @@
 local Model = require("lapis.db.model").Model;
 local Domains = Model:extend("organisations");
 local Attributes = Model:extend("attributes");
-local Gateways = Model:extend("gateways");
-local Users = Model:extend("users");
 local Groups = Model:extend("groups");
 local GroupMembers = Model:extend("group-members");
 local cst = require("constants");
 %>
 <section name="directory" description="xml-server generated full directory">
-<% local domains = Domains:select("WHERE domain LIKE ?;",params.domain); %>
+<% local domains = Domains:select("WHERE domain LIKE ? AND active = 1",params.domain); %>
 <% for _,domain in pairs(domains) do %>
 	<domain name="<%- domain.domain %>">
 		<params>
@@ -31,7 +29,7 @@ local cst = require("constants");
 				<param name="<%- group_var.name %>" value="<%- group_var.value %>"/>
 			<% end; %>
 				<users>
-				<% local group_members = GroupMembers:select("INNER JOIN users USING (uid) WHERE gid = ?",group.gid,{fields = "number"}) %>
+				<% local group_members = GroupMembers:select("INNER JOIN users USING (uid) WHERE gid = ? AND users.active = 1",group.gid,{fields = "number"}) %>
 				<% for _,group_member in pairs(group_members) do %>
 					<user id="<%- group_member.number %>" type="pointer"/>
 				<% end; %>

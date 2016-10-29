@@ -5,7 +5,7 @@ local Attributes = Model:extend("attributes");
 local cst = require("constants");
 %>
 <section name="directory" description="xml-server generated full directory">
-<% local domains = Domains:select("WHERE domain LIKE ?;",params.domain,{fields = "oid"}); %>
+<% local domains = Domains:select("WHERE domain LIKE ? AND active = 1;",params.domain,{fields = "oid"}); %>
 <% for _,domain in pairs(domains) do %>
 	<domain name="<%- params.domain %>">
 		<params>
