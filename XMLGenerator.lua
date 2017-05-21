@@ -46,6 +46,7 @@ function xg.generate(self)
 			and self.params.domain
 		then template = "directory_domain"
 	end;
+	print(template);
 	return {
 		layout = "DefaultXML",
 		render = template or "no_result"

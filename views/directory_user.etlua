@@ -6,7 +6,7 @@ local Users = Model:extend("users");
 local Groups = Model:extend("groups");
 local cst = require("constants");
 %>
-<section name="directory" description="xml-server generated full directory">
+<section name="directory" description="xml-server generated user directory">
 <% local domains = Domains:select("WHERE domain LIKE ? AND active = 1",params.domain); %>
 <% for _,domain in pairs(domains) do %>
 	<domain name="<%- domain.domain %>">
