@@ -1,65 +1,19 @@
-<%
-local Model = require("lapis.db.model").Model;
-local Domains = Model:extend("organisations");
-local Attributes = Model:extend("attributes");
-local Users = Model:extend("users");
-local Groups = Model:extend("groups");
-local cst = require("constants");
-%>
 <section name="directory" description="xml-server generated user directory">
-<% local domains = Domains:select("WHERE domain LIKE ? AND active = 1",params.domain); %>
-<% for _,domain in pairs(domains) do %>
-	<domain name="<%- domain.domain %>">
+	<domain name="<%- tpl_params.domain %>">
 		<params>
 			<param name="dial-string" value="{presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}"/>
 		</params>
-		<variables>
-			<variable user_context="<%= cst.user_context %>"/>
-		</variables>
 		<groups>
 			<group name="default">
 				<users>
 					<user id="default">
 					</user>
-				<% local users = Users:select("WHERE oid = ? AND number LIKE ? AND active = 1",domain.oid,params.user,{fields = "number,name,uid,password,email"}); %>
-				<% for _,user in pairs(users) do %>
-					<user id="<%- user.number %>" mailbox="<%- user.email %>">
-						<params>
-							<param name="dial-string" value="{presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}"/>
-							<param name="a1-hash" value="<%- user.password %>"/>
-						<% local user_params = Attributes:select("WHERE `attr-type` LIKE 'user-param' and id = ?",user.uid,{fields = "name,value"}) %>
-						<% for _,user_param in pairs(user_params) do %>
-							<param name="<%- user_param.name %>" value="<%- user_param.value %>"/>
-						<% end; %>
-						</params>
-						<variables>
-							<variable name="accountcode" value="<%- user.number %>"/>
-							<variable name="effective_caller_id_name" value="<%- user.name %>"/>
-							<variable name="effective_caller_id_number" value="<%- user.number %>"/>
-							<variable name="outbound_caller_id_name" value="<%- user.name %>"/>
-							<variable name="outbound_caller_id_number" value="<%- user.number %>"/>
-						<% local user_vars = Attributes:select("WHERE `attr-type` LIKE 'user-var' and id = ?",user.uid,{fields = "name,value"}) %>
-						<% for _,user_var in pairs(user_vars) do %>
-							<variable name="<%- user_var.name %>" value="<%- user_var.value %>"/>
-						<% end; %>
-						</variables>
+					<user id="<%- tpl_params.user %>">
 					</user>
-				<% end; %>
 				</users>
 			</group>
-		<% local groups = Groups:select("INNER JOIN `group-members` USING (gid)\
-										 INNER JOIN `users` USING (uid)\
-										 WHERE groups.oid = ? AND number LIKE ? AND users.active = 1",domain.oid,params.user,{fields = "gid"}); %>
-		<% for _,group in pairs(groups) do %>
-			<group name="group-<%- group.gid %>">
-				<users>
-					<user id="<%= params.user %>" type="pointer"/>
-				</users>
-			</group>
-		<% end; %>
 		</groups>
 	</domain>
-<% end; %>
 </section>
 
 <!-- 

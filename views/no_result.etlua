@@ -1,3 +1,6 @@
 <section name="result">
 	<result status="not found"/>
+	<% if err then %>
+	<error err="<% tostring(err) %>"/>
+	<% end %>
 </section>
