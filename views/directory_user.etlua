@@ -9,6 +9,9 @@
 					<user id="default">
 					</user>
 					<user id="<%- tpl_params.user %>">
+						<params>
+							<param name="a1-hash" value="*"/>
+						</params>
 					</user>
 				</users>
 			</group>
