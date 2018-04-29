@@ -11,6 +11,9 @@
 					<user id="<%- tpl_params.user %>">
 						<params>
 							<param name="a1-hash" value="*"/>
+							<% for i,k in pairs(tpl_params.user_params) do %>
+							<param name="<%- k.name %>" value="<%- k.value %>"/>
+							<% end %>
 						</params>
 					</user>
 				</users>
